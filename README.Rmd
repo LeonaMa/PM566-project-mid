@@ -14,23 +14,21 @@ always_allow_html: true
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(leaflet)
 ```
 
-Introduction (provide background on your dataset and formulated question), 
+# Introduction (provide background on your dataset and formulated question)
+
 Methods (include how and where the data were acquired, how you cleaned and wrangled the data, what tools you used for data exploration), 
 Preliminary Results (provide summary statistics in tabular form and publication-quality figures, take a look at the kable function from knitr to write nice tables in Rmarkdown), 
 and a brief Conclusion about what you found in terms of the formulated question.
 
 Introduction:
 Methods:
-
-```{r loading needed library}
-library(data.table)
-library(dplyr)
-library(dtplyr)
-library(plyr)
-library(tidyverse)
-```
 
 # Part 1 Data Cleaning and Wrangling
 
@@ -44,7 +42,7 @@ tobacco11_L <- merge(tobacco11, location, by = "State")
 ```
 tobacco11_L missed two obs, but it's fine, we don't want nationwide in map. 
 
-## Step2 creating new varible "smokers and nonsmokers"
+## Step2 creating two new variables "smokers and nonsmokers"
 ```{r creating}
 tobacco[, smokers := `Smoke everyday`+`Smoke some days`]
 tobacco[, nonsmokers := `Former smoker`+`Never smoked`]
@@ -53,57 +51,23 @@ tobacco[, nonsmokers := `Former smoker`+`Never smoked`]
 ## Step3 Spliting the data sets
 ```{r spliting}
 count(tobacco, 'State')
-nation <- tobacco[State == "Nationwide (States and DC)"]
-nation_t <- tobacco[State == "Nationwide (States, DC, and Territories)"]
+nation <- tobacco[State == "Nationwide (States and DC)" | State == "Nationwide (States, DC, and Territories)"]
 area <- tobacco[!State == "Nationwide (States, DC, and Territories)" & !State == "Nationwide (States and DC)"]
 ```
 
 
-# Part 2 Looking at the Data (EDA)
-summary of overall trend in nation wide
+# Part 2 Looking at the Data
+## Step 1 Looing at smokers and nonsmokers overall in nationwide and statewide respectively
+Smokers nationwide:
 ```{r}
-summary(tobacco$smokers)
+ggplot(data = nation, mapping =aes(x = Year, y=smokers, color = State)) +
+  geom_point() +
+  xlab("Years") + ylab("percentage") + 
+  geom_smooth(method=lm,se=FALSE, fullrange=TRUE) +
+  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))
 ```
 
-## Step1 Facet plot showing scatterplots with regression lines of different smoking status vs Year by State.
-
-1. Smoke everyday
-```{r}
-ggplot(data=area, mapping=aes(x = Year, y = `Smoke everyday`)) +
-  geom_point() + 
-  facet_wrap(~State) +
-  geom_smooth(method='lm', formula = y~x)+
-  labs(title = "scatterplots of 'Smoke everyday' vs Year by State", x="Yeas", y="Percentage of people who smoke everyday")
-```
-
-2. Smoke some days
-```{r}
-ggplot(data=area, mapping=aes(x = Year, y = `Smoke some days`)) +
-  geom_point() + 
-  facet_wrap(~State) +
-  geom_smooth(method='lm', formula = y~x)+
-  labs(title = "scatterplots of 'Smoke some days' vs Year by State", x="Yeas", y="Percentage of people who smoke some days")
-```
-
-3. Former smoker
-```{r}
-ggplot(data=area, mapping=aes(x = Year, y = `Former smoker`)) +
-  geom_point() + 
-  facet_wrap(~State) +
-  geom_smooth(method='lm', formula = y~x)+
-  labs(title = "scatterplots of 'Smoke some days' vs Year by State", x="Yeas", y="Percentage of people who are former smoker")
-```
-
-4. Never smoked
-```{r}
-ggplot(data=area, mapping=aes(x = Year, y = `Never smoked`)) +
-  geom_point() + 
-  facet_wrap(~State) +
-  geom_smooth(method='lm', formula = y~x)+
-  labs(title = "scatterplots of 'Smoke some days' vs Year by State", x="Yeas", y="Percentage of people who are Never smoked")
-```
-
-5. Smokers regardless of frequency
+Smokers in statewide
 ```{r}
 ggplot(data=area, mapping=aes(x = Year, y = smokers)) +
   geom_point() + 
@@ -112,7 +76,17 @@ ggplot(data=area, mapping=aes(x = Year, y = smokers)) +
   labs(title = "scatterplots of smokers vs Year by State", x="Yeas", y="Percentage of people who are smokers")
 ```
 
-6. present nonsmokers regardless of history
+Nonsmokers nationwide:
+```{r}
+ggplot(data = nation, mapping =aes(x = Year, y=nonsmokers, color = State)) +
+  geom_point() +
+  xlab("Years") + ylab("percentage") + 
+  geom_smooth(method=lm,se=FALSE, fullrange=TRUE) +
+  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))
+```
+
+
+Nonmokers in statewide
 ```{r}
 ggplot(data=area, mapping=aes(x = Year, y = nonsmokers)) +
   geom_point() + 
@@ -121,9 +95,97 @@ ggplot(data=area, mapping=aes(x = Year, y = nonsmokers)) +
   labs(title = "scatterplots of smokers vs Year by State", x="Yeas", y="Percentage of people who are smokers")
 ```
 
+## Step 2 Looing at 4-level of tobacoo use in nationwide and statewide respectively
+
+
+Smoke everyday in nationwide
 ```{r}
-ggplot(data = nation, mapping =aes(x = Year, y=nonsmokers)) +
+ggplot(data = nation, mapping =aes(x = Year, y=`Smoke everyday`, color = State)) +
   geom_point() +
-  geom_smooth(method='lm', formula = y~x)
+  xlab("Years") + ylab("percentage") + 
+  geom_smooth(method=lm,se=FALSE, fullrange=TRUE) +
+  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))
 ```
+
+
+Smoke everyday in statewide
+```{r}
+ggplot(data=area, mapping=aes(x = Year, y = `Smoke everyday`)) +
+  geom_point() + 
+  facet_wrap(~State) +
+  geom_smooth(method='lm', formula = y~x)+
+  labs(title = "scatterplots of 'Smoke everyday' vs Year by State", x="Yeas", y="Percentage of people who smoke everyday")
+```
+
+Smoke some days in nationwide
+```{r}
+ggplot(data = nation, mapping =aes(x = Year, y=`Smoke some days`, color = State)) +
+  geom_point() +
+  xlab("Years") + ylab("percentage") + 
+  geom_smooth(method=lm,se=FALSE, fullrange=TRUE) +
+  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))
+```
+
+
+Smoke some days in statewide
+```{r}
+ggplot(data=area, mapping=aes(x = Year, y = `Smoke some days`)) +
+  geom_point() + 
+  facet_wrap(~State) +
+  geom_smooth(method='lm', formula = y~x)+
+  labs(title = "scatterplots of 'Smoke some days' vs Year by State", x="Yeas", y="Percentage of people who smoke some days")
+```
+
+
+Former smoker in nationwide
+```{r}
+ggplot(data = nation, mapping =aes(x = Year, y=`Former smoker`, color = State)) +
+  geom_point() +
+  xlab("Years") + ylab("percentage") + 
+  geom_smooth(method=lm,se=FALSE, fullrange=TRUE) +
+  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))
+```
+
+
+Former smoker in statewide
+```{r}
+ggplot(data=area, mapping=aes(x = Year, y = `Former smoker`)) +
+  geom_point() + 
+  facet_wrap(~State) +
+  geom_smooth(method='lm', formula = y~x)+
+  labs(title = "scatterplots of 'Smoke some days' vs Year by State", x="Yeas", y="Percentage of people who are former smoker")
+```
+
+Never smoked in nationwide
+```{r}
+ggplot(data = nation, mapping =aes(x = Year, y=`Never smoked`, color = State)) +
+  geom_point() +
+  xlab("Years") + ylab("percentage") + 
+  geom_smooth(method=lm,se=FALSE, fullrange=TRUE) +
+  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))
+```
+
+Never smoked in statewide
+```{r}
+ggplot(data=area, mapping=aes(x = Year, y = `Never smoked`)) +
+  geom_point() + 
+  facet_wrap(~State) +
+  geom_smooth(method='lm', formula = y~x)+
+  labs(title = "scatterplots of 'Smoke some days' vs Year by State", x="Yeas", y="Percentage of people who are Never smoked")
+```
+## Step 3 See percentage of smokers over the country in most recent year, 2011
+```{r}
+tem.pal <- colorNumeric(c('green','yellow','red'), domain=tobacco11_L$`Smoke everyday`)
+leaflet(tobacco11_L) %>% 
+  addTiles() %>%
+  addCircles (lat = ~Latitude, lng = ~Longitude, color = ~tem.pal(`Smoke everyday`),
+               label = ~`Smoke everyday`, 
+               opacity=1, fillOpacity = 1, radius = 5000) %>%
+  addLegend('bottomleft', pal= tem.pal, values = tobacco11_L$`Smoke everyday`,
+             title ='percentage of smokers', opacity=0.5)
+```
+
+
+
+
 
