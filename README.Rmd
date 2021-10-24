@@ -1,7 +1,7 @@
 ---
 title: "PM566 Midterm Project"
 author: "Leona Ma"
-date: "10/21/2021"
+date: "10/24/2021"
 output: 
     html_document:
       toc: yes 
@@ -56,7 +56,7 @@ area <- tobacco[!State == "Nationwide (States, DC, and Territories)" & !State ==
 
 # Part 2 Looking at the Data
 
-```{r include=FALSE}
+```{r results='hide'}
 dim(tobacco)
 head(tobacco)
 tail(tobacco)
@@ -137,7 +137,7 @@ ggplot(data = nation, mapping =aes(x = Year, y=`Smoke everyday`, color = State))
   geom_point() +
   geom_smooth(method=lm,se=FALSE, fullrange=TRUE) +
   scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))+
-  labs(title = "scatterplots of people who smoke everyday vs Year in nationwide", x="Years", y="Percentage of people who smoker everyday")
+  labs(title = "scatterplots of people who smoke everyday vs Year in nationwide", x="Years", y="Percentage of people who smoke everyday")
 ```
 
 
@@ -155,10 +155,10 @@ For proportions of people who smoke everyday, we can see that it is pretty simil
 ### Smoke some days in nationwide
 ```{r}
 ggplot(data = nation, mapping =aes(x = Year, y=`Smoke some days`, color = State)) +
-  geom_point() +
-  xlab("Years") + ylab("percentage") + 
+  geom_point() + 
   geom_smooth(method=lm,se=FALSE, fullrange=TRUE) +
-  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))
+  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))+
+  labs(title = "scatterplots of people who smoke some day vs Year in nationwide", x="Years", y="Percentage of people who smoke some day")
 ```
 
 
@@ -177,9 +177,9 @@ From the first nationwide plot, we can see that proportions of prople who smoke 
 ```{r}
 ggplot(data = nation, mapping =aes(x = Year, y=`Former smoker`, color = State)) +
   geom_point() +
-  xlab("Years") + ylab("percentage") + 
   geom_smooth(method=lm,se=FALSE, fullrange=TRUE) +
-  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))
+  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))+
+  labs(title = "scatterplots of people who are former smoker vs Year in nationwide", x="Years", y="Percentage of people who are former smoker")
 ```
 
 
@@ -198,9 +198,9 @@ From the plot of proportions of people who are former smokers, we can see the ov
 ```{r}
 ggplot(data = nation, mapping =aes(x = Year, y=`Never smoked`, color = State)) +
   geom_point() +
-  xlab("Years") + ylab("percentage") + 
   geom_smooth(method=lm,se=FALSE, fullrange=TRUE) +
-  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))
+  scale_x_continuous(limits=c(1995, 2011), breaks = seq(1995, 2011, 1))+
+  labs(title = "scatterplots of people who never smoked vs Year in nationwide", x="Years", y="Percentage of people who never smoked")
 ```
 
 ### Never smoked in statewide
